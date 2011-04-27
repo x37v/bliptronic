@@ -62,6 +62,8 @@
 # MCU name
 MCU = at90usb646
 
+USB_MIDI_NAME = bliptronic
+USB_MIDI_NAME_LEN = 11
 
 # Target board (see library "Board Types" documentation, NONE for projects not requiring
 # LUFA board drivers). If USER is selected, put custom board drivers in a directory called
@@ -188,6 +190,8 @@ CDEFS  = -DF_CPU=$(F_CPU)UL
 CDEFS += -DF_CLOCK=$(F_CLOCK)UL
 CDEFS += -DBOARD=BOARD_$(BOARD)
 CDEFS += $(LUFA_OPTS)
+CDEFS += -DUSB_MIDI_NAME=L\"$(USB_MIDI_NAME)\"
+CDEFS += -DUSB_MIDI_NAME_LEN=$(USB_MIDI_NAME_LEN)
 
 
 # Place -D or -U options here for ASM sources
