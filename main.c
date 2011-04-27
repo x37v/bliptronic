@@ -5,6 +5,30 @@ void fallthrough_callback(MidiDevice * device, uint16_t cnt, uint8_t byte0, uint
    midi_send_data(device, cnt, byte0, byte1, byte2);
 }
 
+/*
+ * as reference
+ * http://www.straytechnologies.com/bliptronic-5000-hacking-full-pin-out-to-the-64-button-pcb/
+ *
+ * outputs:
+ *
+ * button power:
+ * b5 u7 reset
+ * b4 u7 clock
+ *
+ * led power [columns]:
+ * b3 u5 clock
+ * b2 u5 reset
+ *
+ * led grounds [rows]:
+ * b1 u3 SH_CP
+ * b0 u3 ST_CP
+ *
+ * e0 shared serial out
+ *
+ * button inputs:
+ * porta
+ */
+
 
 int main(void) {
    MidiDevice usb_midi;
