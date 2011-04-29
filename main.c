@@ -101,19 +101,29 @@ void init(MidiDevice * usb_midi) {
    cur_led_row = 0;
 }
 
+void drawLeds(uint8_t * leds) {
+   updateLedRow();
+   shiftLedCol(leds[cur_led_row]);
+}
 
 int main(void) {
    uint8_t i = 0;
    MidiDevice usb_midi;
+   uint8_t leds[8];
+
+   for(i = 0; i < 8; i++) {
+      leds[i] = 0;
+   }
+
+   leds[1] = 0xaa;
 
    init(&usb_midi);
-   updateLedRow();
-   updateLedRow();
-   updateLedRow();
-   shiftLedCol(0xaa);
 
    while(1){
+      drawLeds(leds);
+      _delay_us(100);
       midi_device_process(&usb_midi);
+      shiftLedCol(0x00);
    }
 
    return 0;
