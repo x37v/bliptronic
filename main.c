@@ -69,7 +69,7 @@ void updateLedRow() {
    PORTB |= _BV(LED_POWER_CLK);
 }
 
-void init(MidiDevice * usb_midi) {
+void init(MidiDevice * usb_midi, uint8_t *leds) {
    uint8_t i;
 
    midi_usb_init(usb_midi);
@@ -99,6 +99,9 @@ void init(MidiDevice * usb_midi) {
    PORTB |= _BV(LED_POWER_CLK);
 
    cur_led_row = 0;
+
+   for(i = 0; i < 8; i++)
+      leds[i] = 0;
 }
 
 void drawLeds(uint8_t * leds) {
@@ -111,19 +114,22 @@ int main(void) {
    MidiDevice usb_midi;
    uint8_t leds[8];
 
-   for(i = 0; i < 8; i++) {
-      leds[i] = 0;
-   }
+   init(&usb_midi, leds);
 
-   leds[1] = 0xaa;
-
-   init(&usb_midi);
+   //make the leds into an 'A'
+   leds[0] = 0x18;
+   leds[1] = 0x24;
+   leds[2] = 0x42;
+   for(i = 3; i < 8; i++)
+      leds[i] = 0x81;
+   leds[4] = 0xFF;
 
    while(1){
       drawLeds(leds);
       _delay_us(100);
       midi_device_process(&usb_midi);
       shiftLedCol(0x00);
+      _delay_us(10);
    }
 
    return 0;
