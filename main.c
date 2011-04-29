@@ -47,6 +47,7 @@ void setSerial(uint8_t v) {
 
 void shiftLedCol(uint8_t col) {
    uint8_t i;
+   col = ~col;
    PORTB &= ~_BV(ST_CP);
    for(i = 0; i < 8; i++) {
       PORTB &= ~_BV(SH_CP);
@@ -56,11 +57,22 @@ void shiftLedCol(uint8_t col) {
    PORTB |= _BV(ST_CP);
 }
 
+void updateLedRow() {
+   PORTB &= ~_BV(LED_POWER_CLK);
+   cur_led_row++;
+   if(cur_led_row > 8) {
+      cur_led_row = 0;
+      setSerial(1);
+   } else {
+      setSerial(0);
+   }
+   PORTB |= _BV(LED_POWER_CLK);
+}
 
-int main(void) {
+void init(MidiDevice * usb_midi) {
    uint8_t i;
-   MidiDevice usb_midi;
-   midi_usb_init(&usb_midi);
+
+   midi_usb_init(usb_midi);
 
    //e0 serial output
    DDRE |= _BV(PE0);
@@ -76,22 +88,31 @@ int main(void) {
 
    midi_register_fallthrough_callback(&usb_midi, fallthrough_callback);
 
-   PORTB &= ~_BV(LED_POWER_CLK);
-   setSerial(0);
-   PORTB |= _BV(LED_POWER_CLK);
-
-   PORTB &= ~_BV(LED_POWER_CLK);
-   setSerial(1);
-   PORTB |= _BV(LED_POWER_CLK);
-
-   for(i = 1; i < 7; i++) {
+   for(i = 1; i < 8; i++) {
       PORTB &= ~_BV(LED_POWER_CLK);
       setSerial(0);
       PORTB |= _BV(LED_POWER_CLK);
    }
 
+   PORTB &= ~_BV(LED_POWER_CLK);
+   setSerial(1);
+   PORTB |= _BV(LED_POWER_CLK);
+
+   cur_led_row = 0;
+}
+
+
+int main(void) {
+   uint8_t i = 0;
+   MidiDevice usb_midi;
+
+   init(&usb_midi);
+   updateLedRow();
+   updateLedRow();
+   updateLedRow();
+   shiftLedCol(0xaa);
+
    while(1){
-      shiftLedCol(0xf0);
       midi_device_process(&usb_midi);
    }
 
